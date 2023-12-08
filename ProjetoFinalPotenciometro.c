@@ -29,12 +29,10 @@ int d1 = 10;
 int d2 = 20;
 int d3 = 10;
 
-// Flag to indicate whether the user is adjusting angles
-bool adjusting = true;
+// Flag pra indicar se o usuario ainda esta ajustando os angulos
+bool ajustando = true;
 
 void setup() {
-  
-// Set analog resolution to 12 bits (0-4095)
   
   // CONECTA OS SERVOS
   servo1.attach(servo1Pin);
@@ -45,7 +43,6 @@ void setup() {
   servo2.write(minT2);
 
   Serial.begin(9600);
-
 }
 
 void loop() {
@@ -54,22 +51,24 @@ void loop() {
   
   static bool printado = false;
 
-  // Check if there is any input from Serial monitor
+  // Verifica se tem input do Serial Monitor
   if (!printado) {
     Serial.println("Informe 0 quando terminar de ajustar: ");
-    printado = true; // Set the flag to true so the message won't be printed again
+    printado = true; // Flag pra true pra não printar novamente nesse loop
   }
   if (Serial.available() > 0) {
     char input = Serial.read();
     if (input == '0') {
-      adjusting = false;  // Parar de ajustar os angulos
+      ajustando = false;  // Parar de ajustar os angulos
       printado = false;   // Printado para false para printar novamente no próximo loop
     }
   }
-
-  if (adjusting) {
+  
+  // LE VALORES DO POTENCIOMETRO E MAPEIA PARA OS LIMITES DOS SERVOS
+  if (ajustando) {
     theta1 = analogRead(pin1);
     theta1 = map(theta1, 0, 1023, minT1, maxT1);
+    theta1 = round(theta1 / 5.0) * 5; // AJUSTA PARA MULTIPLOS DE 5
     servo1.write(theta1);
     if (theta1 != theta1Ant) {
       servo1.write(theta1);
@@ -80,6 +79,7 @@ void loop() {
 
     theta2 = analogRead(pin2);
     theta2 = map(theta2, 0, 1023, minT2, maxT2);
+    theta2 = round(theta2 / 5.0) * 5; // AJUSTA PARA MULTIPLOS DE 5
     servo2.write(theta2);
     if (theta2 != theta2Ant) {
       servo2.write(theta2);
@@ -102,6 +102,6 @@ void loop() {
       Serial.println(P[i][0], 4);
     }
     
-    adjusting = true;
+    ajustando = true;
   }
 }
